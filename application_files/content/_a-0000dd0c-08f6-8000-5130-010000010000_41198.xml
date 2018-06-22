@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<contentHaul xmlns:a="http://www.appian.com/ae/types/2009">
+    <versionUuid>_a-0000e0e6-ca6a-8000-6ee0-010000010000_70184</versionUuid>
+    <rule>
+        <name>EPAS_StudyReport</name>
+        <uuid>_a-0000dd0c-08f6-8000-5130-010000010000_41198</uuid>
+        <description>Study Details for Report : from studySetupInfo Entity</description>
+        <parentUuid>_a-0000dd0c-ffa4-8000-5130-010000010000_42718</parentUuid>
+        <visibility>
+            <advertise>false</advertise>
+            <hierarchy>true</hierarchy>
+            <indexable>true</indexable>
+            <quota>false</quota>
+            <searchable>true</searchable>
+            <system>false</system>
+            <unlogged>false</unlogged>
+        </visibility>
+        <definition>load(
+  local!pagingInfo: #"SYSTEM_SYSRULES_pagingInfo"(
+    startIndex: 1,
+    batchSize: 10,
+    sort: #"SYSTEM_SYSRULES_sortInfo"(
+      field: "studySetupId",
+      ascending: false
+    )
+  ),
+  with(
+    local!datasubset: #"SYSTEM_SYSRULES_queryEntity"(
+      entity: #"_a-0000dcd7-2308-8000-5130-010000010000_35312",
+      query: #"SYSTEM_SYSRULES_query"(
+/*         selection: a!querySelection(columns: {
+          a!queryColumn(field: "studySetupId"),
+          a!queryColumn(field: "noOfPrimaryReviewers"),
+          a!queryColumn(field: "noOfSecondaryReviewers"),
+          a!queryColumn(field: "createdBy"),
+          a!queryColumn(field: "createdTimeStamp"),
+          a!queryColumn(field: "DocumentTimeline"),
+        }), */
+        pagingInfo: local!pagingInfo
+      )
+    ),
+    #"SYSTEM_SYSRULES_gridField"(
+      label:"Study Details",
+      instructions :"Details of all the Studies to be configured.",
+      totalCount: local!datasubset.totalCount,
+      columns: {
+        #"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "Study ID",
+          field: "studySetupId",
+          data: index(local!datasubset.data, "studySetupId", null),
+          links:
+            if( #"_a-0000d62a-67b3-8000-da6f-010000010000_951"( local!datasubset.data ), null, 
+                apply( #"SYSTEM_SYSRULES_recordLink"( recordType:#"_a-0000dd0c-08f6-8000-5130-010000010000_41179", identifier:_ ) 
+                , index( local!datasubset.data, "studySetupId", null ) 
+                ) )
+        ),
+       #"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "Study Name",
+          field: "studyName",
+          data:index(local!datasubset.data, "studyName",null)
+        ),
+        #"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "Description",
+          field: "description",
+          data: index(local!datasubset.data, "description",null)
+        ),
+        #"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "No of Primary Reviewers",
+          field: "noOfPrimReviewers",
+          data: index(local!datasubset.data,"noOfPrimReviewers",null)
+        ),		
+/*          a!gridImageColumn(
+          label: "No of Primary Reviewers",
+          field: "noOfPrimaryReviewers",
+          data: a!applyComponents(function:rule!CMN_webImageDynamic,
+                    array:merge(index(local!datasubset.data,"noOfPrimaryReviewers",{}),
+                    repeat(count(local!datasubset.totalCount),false()),
+                    repeat(count(local!datasubset.totalCount),false()))),
+          size:"ICON"          
+        ),  */
+/*         a!gridImageColumn(
+          label: "No of Secondary Reviewers",
+          field: "noOfSecondaryReviewers",
+          data: a!applyComponents(function:rule!CMN_webImageDynamic,
+                    array:merge(index(local!datasubset.data,"noOfSecondaryReviewers",{}),
+                    repeat(count(local!datasubset.totalCount),false()),
+                    repeat(count(local!datasubset.totalCount),false()))),
+          size:"ICON"                              
+        ), */
+/*         a!gridTextColumn(
+          label: "Created By",
+          field: "createdBy",
+          data: index(local!datasubset.data, "createdBy", null)
+        ), */
+        #"SYSTEM_SYSRULES_gridImageColumn"(
+          label: "Created By",
+          field: "createdBy",
+          data: apply(#"_a-0000dcd1-5675-8000-5130-010000010000_33327"(_),
+                touser(index(local!datasubset.data, "createdBy", null))
+          )                       
+        ), 
+        #"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "Created On",
+          field: "createdOn",
+          data: text(todate(index(local!datasubset.data, "createdOn", null)),"mmm/dd/yy")
+        ),
+		#"SYSTEM_SYSRULES_gridTextColumn"(
+          label: "Doc(s) due Days",
+          field: "docTimeline",
+          data: index(local!datasubset.data,"docTimeline",{})
+        ),
+/*         a!gridImageColumn(
+          label: "Doc(s) due Days",
+          field: "DocumentTimeline",
+          data: a!applyComponents(function:rule!CMN_webImageDynamic,
+                    array:merge(index(local!datasubset.data,"DocumentTimeline",{}),
+                    repeat(count(local!datasubset.totalCount),false()),
+                    repeat(count(local!datasubset.totalCount),false()))),
+          size:"ICON"                              
+        ),  */
+        #"SYSTEM_SYSRULES_gridImageColumn"(
+          label: "Status",
+          field: "status",
+          data:if(
+              #"_a-0000d62a-67b3-8000-da6f-010000010000_951"(local!datasubset.data),
+               null,
+               apply(#"_a-0000dd0c-08f6-8000-5130-010000010000_41203"(_),
+               index(local!datasubset.data,"status",null))
+	             ),
+	             size:"ICON"
+        ) 
+      },
+      value: local!pagingInfo,
+      saveInto: local!pagingInfo
+    )
+  )
+)
+</definition>
+        <metadataExpr></metadataExpr>
+        <preferredEditor>interface</preferredEditor>
+        <offlineEnabled>false</offlineEnabled>
+    </rule>
+    <roleMap public="true">
+        <role inherit="true" allowForAll="false" name="readers">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="true" allowForAll="false" name="authors">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="true" allowForAll="false" name="administrators">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyReaders">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyAuthors">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyAdministrators">
+            <users/>
+            <groups/>
+        </role>
+    </roleMap>
+    <history>
+        <historyInfo versionUuid="_a-0000e0e6-ca6a-8000-6ee0-010000010000_70057"/>
+        <historyInfo versionUuid="_a-0000e0e6-ca6a-8000-6ee0-010000010000_70184"/>
+    </history>
+</contentHaul>
